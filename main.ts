@@ -66,26 +66,26 @@ class MyStack extends TerraformStack {
     });
 
     const test_target = new google.googleClouddeployTarget.GoogleClouddeployTarget(this, 'test-target', {
+      run: {
+        location: `projects/${project}/locations/${region}`,
+      },
       executionConfigs: [{
         usages: ['RENDER', 'DEPLOY', 'VERIFY']
       }],
       location: region,
       name: 'test-target',
-      run: {
-        location: `projects/${project}/locations/${region}`,
-      },
     });
 
     const production_target = new google.googleClouddeployTarget.GoogleClouddeployTarget(this, 'production-target', {
+      run: {
+        location: `projects/${project}/locations/${region}`,
+      },
       executionConfigs: [{
         usages: ['RENDER', 'DEPLOY', 'VERIFY']
       }],
       location: region,
       name: 'production-target',
       requireApproval: true,
-      run: {
-        location: `projects/${project}/locations/${region}`,
-      },
     });
 
     new google.googleClouddeployDeliveryPipeline.GoogleClouddeployDeliveryPipeline(this, 'pipeline', {
