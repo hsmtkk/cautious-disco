@@ -1,0 +1,7 @@
+---
+steps:
+  - name: gcr.io/kaniko-project/executor:latest
+    args:
+      - --cache=true
+      - --cache-ttl=168h
+      - --destination=gcr.io/$PROJECT_ID/image
