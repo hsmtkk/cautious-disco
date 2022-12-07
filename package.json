@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@cdktf/provider-google": "4.0.2",
+    "@cdktf/provider-google-beta": "^4.0.2",
     "cdktf": "^0.14.2",
     "constructs": "^10.1.182"
   },

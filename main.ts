@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 import { Construct } from "constructs";
 import { App, TerraformStack, CloudBackend, NamedCloudWorkspace } from "cdktf";
-import * as google from '@cdktf/provider-google';
+import * as google from '@cdktf/provider-google-beta';
 
 const project = 'cautious-disco';
 const region = 'us-central1';
@@ -12,12 +12,12 @@ class MyStack extends TerraformStack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    new google.provider.GoogleProvider(this, 'google', {
+    new google.provider.GoogleBetaProvider(this, 'google', {
       project,
       region,
     });
 
-    new google.cloudbuildTrigger.CloudbuildTrigger(this, 'trigger', {
+    new google.googleCloudbuildTrigger.GoogleCloudbuildTrigger(this, 'trigger', {
       filename: 'cloudbuild.yaml',
       github: {
         owner: 'hsmtkk',
@@ -28,17 +28,17 @@ class MyStack extends TerraformStack {
       },
     });
 
-    new google.artifactRegistryRepository.ArtifactRegistryRepository(this, 'registry', {
+    new google.googleArtifactRegistryRepository.GoogleArtifactRegistryRepository(this, 'registry', {
       format: 'docker',
       location: region,
       repositoryId: 'registry',
     });
 
-    const runner = new google.serviceAccount.ServiceAccount(this, 'runner', {
+    const runner = new google.googleServiceAccount.GoogleServiceAccount(this, 'runner', {
       accountId: 'runner',
     });
 
-    const example_service = new google.cloudRunService.CloudRunService(this, 'example-service', {
+    const example_service = new google.googleCloudRunService.GoogleCloudRunService(this, 'example-service', {
       autogenerateRevisionName: true,
       location: region,
       name: 'example-service',
@@ -59,30 +59,48 @@ class MyStack extends TerraformStack {
       }],
     });
 
-    new google.cloudRunServiceIamPolicy.CloudRunServiceIamPolicy(this, 'run-noauth-policy', {
+    new google.googleCloudRunServiceIamPolicy.GoogleCloudRunServiceIamPolicy(this, 'run-noauth-policy', {
       location: region,
       policyData: run_noauth.policyData,
       service: example_service.name,      
     });
 
-    const test_target = new google.clouddeployTarget.ClouddeployTarget(this, 'test-target', {
+    const test_target = new google.googleClouddeployTarget.GoogleClouddeployTarget(this, 'test-target', {
+      executionConfigs: [{
+        usages: ['RENDER', 'DEPLOY', 'VERIFY']
+      }],
       location: region,
       name: 'test-target',
+      run: {
+        location: `projects/${project}/locations/${region}`,
+      },
     });
 
-    const production_target = new google.clouddeployTarget.ClouddeployTarget(this, 'production-target', {
+    const production_target = new google.googleClouddeployTarget.GoogleClouddeployTarget(this, 'production-target', {
+      executionConfigs: [{
+        usages: ['RENDER', 'DEPLOY', 'VERIFY']
+      }],
       location: region,
       name: 'production-target',
       requireApproval: true,
+      run: {
+        location: `projects/${project}/locations/${region}`,
+      },
     });
 
-    new google.clouddeployDeliveryPipeline.ClouddeployDeliveryPipeline(this, 'pipeline', {
+    new google.googleClouddeployDeliveryPipeline.GoogleClouddeployDeliveryPipeline(this, 'pipeline', {
       location: region,
       name: 'pipeline',
       serialPipeline: {
         stages: [
-          {targetId: test_target.id},
-          {targetId: production_target.id},
+          {
+            profiles: ['test'],
+            targetId: test_target.id,
+          },
+          {
+            profiles: ['production'],
+            targetId: production_target.id,
+          },
         ],
       },
     });
