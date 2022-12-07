@@ -4,6 +4,6 @@ steps:
     args:
       - --cache=true
       - --cache-ttl=168h
-      - --destination=gcr.io/$PROJECT_ID/image
+      - --destination=${_REGION}-docker.pkg.dev/${PROJECT_ID}/registry/webapp:$COMMIT_SHA
 substitutions:
   _REGION: us-central1
