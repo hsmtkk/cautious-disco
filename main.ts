@@ -28,6 +28,12 @@ class MyStack extends TerraformStack {
       },
     });
 
+    new google.artifactRegistryRepository.ArtifactRegistryRepository(this, 'registry', {
+      format: 'docker',
+      location: region,
+      repositoryId: 'registry',
+    });
+
     const runner = new google.serviceAccount.ServiceAccount(this, 'runner', {
       accountId: 'runner',
     });

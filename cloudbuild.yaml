@@ -5,3 +5,5 @@ steps:
       - --cache=true
       - --cache-ttl=168h
       - --destination=gcr.io/$PROJECT_ID/image
+substitutions:
+  _REGION: us-central1
